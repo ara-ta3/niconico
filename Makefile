@@ -4,6 +4,7 @@ DOCKER=docker
 MYSQL_CONFIG=.my.cnf
 MYSQL=mysql --defaults-extra-file=$(MYSQL_CONFIG)
 SETTINGS=settings.json
+series_id=
 
 install:
 	$(NPM) install
@@ -12,7 +13,7 @@ compile:
 	$(NPM) run tsc
 
 run: compile $(SETTINGS)
-	$(NODE) src/index.js --unhandled-rejections=strict
+	$(NODE) src/index.js $(series_id)
 
 mysql/docker:
 	$(DOCKER) run \

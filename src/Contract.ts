@@ -1,4 +1,4 @@
-export type SeriesID = number;
+export type SeriesID = string;
 
 export type VideoID = string;
 

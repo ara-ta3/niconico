@@ -9,7 +9,8 @@ async function settings(path: string = "./settings.json"): Promise<Settings> {
   return settings;
 }
 
-async function main() {
+async function main(args: string[]) {
+  const seriesId = args[2];
   const setting = await settings();
   const connection = await mysql.createConnection({
     host: setting.mysql.host,
@@ -18,7 +19,6 @@ async function main() {
     database: "niconico",
   });
 
-  const seriesId = 106485;
   const comments = await fetchComments(seriesId);
 
   const repository = new CommentRepository(connection);
@@ -37,4 +37,4 @@ interface Settings {
   };
 }
 
-main().catch((e) => console.error(e));
+main(process.argv).catch((e) => console.error(e));
