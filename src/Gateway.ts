@@ -42,7 +42,7 @@ export async function fetchVideo(
       `failed to find js-initial-watch-data dom. video = ${videoId} count = ${count} wait ${msec} milliseconds`
     );
     await sleep(msec);
-    return this.fetchThreadId(videoId, count + 1);
+    return this.fetchVideo(videoId, count + 1);
   }
   const jsonString = apiDataDom.attributes.getNamedItem("data-api-data").value;
   const json: {
@@ -57,7 +57,7 @@ export async function fetchVideo(
     id: videoId,
     title: json.video.title,
     threadId: thread.ids.default,
-    postedAt: moment(json.video.postedDateTime),
+    postedAt: moment(json.video.postedDateTime, "YYYY/MM/DD HH:mm:ss"),
   };
 }
 
