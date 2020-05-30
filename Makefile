@@ -22,7 +22,7 @@ mysql/docker:
 		-d -p 3306:3306 mysql:5.5
 
 mysql:
-	$(MYSQL) -uroot -pmysqlrootpassword -h 127.0.0.1
+	$(MYSQL) -uroot -pmysqlrootpassword -h 127.0.0.1 niconico
 
 migrate/database:
 	$(MYSQL) -e "CREATE DATABASE IF NOT EXISTS niconico"
