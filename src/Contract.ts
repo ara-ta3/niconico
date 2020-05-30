@@ -1,0 +1,17 @@
+export type SeriesID = number;
+
+export type VideoID = string;
+
+export type ThreadID = string;
+
+export interface ThreadResponseBody {
+  thread?: {};
+  chat?: Chat;
+}
+
+export interface Chat {
+  no: number;
+  date: number;
+  user_id: string;
+  content: string;
+}
