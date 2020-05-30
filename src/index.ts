@@ -1,7 +1,7 @@
 import { promises as fs } from "fs";
 import * as mysql from "promise-mysql";
-import { fetchComments } from "./Service";
-import { CommentRepository } from "./Gateway";
+import { fetch } from "./Service";
+import { CommentRepository, VideoRepository } from "./Gateway";
 
 async function settings(path: string = "./settings.json"): Promise<Settings> {
   const settingsString = await fs.readFile(path, "utf8");
@@ -19,11 +19,14 @@ async function main(args: string[]) {
     database: "niconico",
   });
 
-  const comments = await fetchComments(seriesId);
+  const [videos, comments] = await fetch(seriesId);
 
-  const repository = new CommentRepository(connection);
+  const commentRepository = new CommentRepository(connection);
+  const videoRepository = new VideoRepository(connection);
   connection.beginTransaction();
-  await repository.put(comments);
+
+  await commentRepository.put(comments);
+  await videoRepository.put(videos);
   connection.commit();
   connection.end();
 }

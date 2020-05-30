@@ -1,19 +1,15 @@
-import { SeriesID, VideoID, Chat } from "./Contract";
-import {
-  fetchVideoIds,
-  fetchThreadId,
-  JSInitialWatchDataNotFoundError,
-  fetchChats,
-} from "./Gateway";
+import { SeriesID, VideoID, Chat, Video } from "./Contract";
+import { fetchVideoIds, fetchVideo, fetchChats } from "./Gateway";
 
-export async function fetchComments(
+export async function fetch(
   seriesId: SeriesID
-): Promise<Map<VideoID, Chat[]>> {
+): Promise<[Video[], Map<VideoID, Chat[]>]> {
   const seriesUrl = `https://www.nicovideo.jp/series/${seriesId}`;
   const ids = await fetchVideoIds(seriesUrl);
+  let videos: Array<Video> = [];
   let comments: Map<string, Chat[]> = new Map();
   const all = ids.map(async (id) => {
-    const threadId = await fetchThreadId(id).catch((err) => {
+    const video: Video | null = await fetchVideo(id).catch((err) => {
       // FIXME instanceof
       if (err.videoId !== undefined) {
         console.error(err);
@@ -21,13 +17,14 @@ export async function fetchComments(
       }
       return Promise.reject(err);
     });
-    if (threadId === null) {
+    if (video === null) {
       return;
     }
-    const chats = await fetchChats(threadId);
+    const chats = await fetchChats(video.threadId);
+    videos.push(video);
     comments.set(id, chats);
     return;
   });
   await Promise.all(all);
-  return comments;
+  return [videos, comments];
 }

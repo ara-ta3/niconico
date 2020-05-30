@@ -15,3 +15,10 @@ export interface Chat {
   user_id: string;
   content: string;
 }
+
+export interface Video {
+  id: VideoID;
+  title: string;
+  threadId: ThreadID;
+  postedAt: moment.Moment;
+}

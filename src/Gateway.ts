@@ -2,7 +2,7 @@ import * as request from "request-promise-native";
 import * as mysql from "promise-mysql";
 import * as moment from "moment";
 import { JSDOM } from "jsdom";
-import { VideoID, ThreadResponseBody, ThreadID, Chat } from "./Contract";
+import { VideoID, ThreadResponseBody, ThreadID, Chat, Video } from "./Contract";
 
 async function sleep(msec: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, msec));
@@ -18,10 +18,10 @@ export async function fetchVideoIds(seriesUrl: string): Promise<VideoID[]> {
   );
 }
 
-export async function fetchThreadId(
+export async function fetchVideo(
   videoId: VideoID,
   count: number = 1
-): Promise<ThreadID> {
+): Promise<Video> {
   const url = `https://www.nicovideo.jp/watch/${videoId}`;
   const res = await request.get(url);
   const page = await new JSDOM(res);
@@ -46,10 +46,19 @@ export async function fetchThreadId(
   }
   const jsonString = apiDataDom.attributes.getNamedItem("data-api-data").value;
   const json: {
+    video: {
+      title: string;
+      postedDateTime: string;
+    };
     thread: Thread;
   } = JSON.parse(jsonString);
   const thread = json.thread;
-  return thread.ids.default;
+  return {
+    id: videoId,
+    title: json.video.title,
+    threadId: thread.ids.default,
+    postedAt: moment(json.video.postedDateTime),
+  };
 }
 
 export async function fetchChats(threadId: ThreadID): Promise<Chat[]> {
@@ -106,6 +115,25 @@ export class CommentRepository {
           date.format("YYYY-MM-DDTHH:mm:ss"),
         ]);
       });
+    });
+  }
+}
+
+export class VideoRepository {
+  readonly connection: mysql.Connection;
+  constructor(connection: mysql.Connection) {
+    this.connection = connection;
+  }
+
+  async put(videos: Video[]): Promise<void> {
+    const query =
+      "INSERT INTO videos(id, title, posted_at) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE title=VALUES(title)";
+    videos.forEach((video) => {
+      this.connection.query(query, [
+        video.id,
+        video.title,
+        video.postedAt.format("YYYY-MM-DDTHH:mm:ss"),
+      ]);
     });
   }
 }

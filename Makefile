@@ -28,7 +28,7 @@ migrate/database:
 	$(MYSQL) -e "CREATE DATABASE IF NOT EXISTS niconico"
 
 migrate:
-	cat migration.sql|$(MYSQL) niconico
+	cat migrations/*.sql|$(MYSQL) niconico
 
 $(MYSQL_CONFIG): my.sample.cnf
 	cp -f $< $@
