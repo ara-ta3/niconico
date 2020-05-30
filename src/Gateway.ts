@@ -1,4 +1,6 @@
 import * as request from "request-promise-native";
+import * as mysql from "promise-mysql";
+import * as moment from "moment";
 import { JSDOM } from "jsdom";
 import { VideoID, ThreadResponseBody, ThreadID, Chat } from "./Contract";
 
@@ -65,5 +67,35 @@ export class JSInitialWatchDataNotFoundError extends Error {
   constructor(message: string, videoId: string) {
     super(message);
     this.videoId = videoId;
+  }
+}
+
+export class CommentRepository {
+  readonly connection: mysql.Connection;
+  constructor(connection: mysql.Connection) {
+    this.connection = connection;
+  }
+
+  async deleteAll(): Promise<void> {
+    const query = "DELETE FROM comments;";
+    this.connection.query(query);
+    return;
+  }
+
+  async put(comments: Map<VideoID, Chat[]>): Promise<void> {
+    const query =
+      "INSERT INTO comments(no, video_id, user_id, content, posted_at) VALUES(?, ?, ?, ?, ?)";
+    comments.forEach((chats, videoId) => {
+      chats.forEach((chat) => {
+        const date = moment.unix(chat.date);
+        this.connection.query(query, [
+          chat.no,
+          videoId,
+          chat.user_id,
+          chat.content,
+          date.format("YYYY-MM-DDTHH:mm:ss"),
+        ]);
+      });
+    });
   }
 }

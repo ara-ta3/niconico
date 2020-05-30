@@ -3,6 +3,7 @@ NODE=node
 DOCKER=docker
 MYSQL_CONFIG=my.cnf
 MYSQL=mysql --defaults-extra-file=$(MYSQL_CONFIG)
+SETTINGS=settings.json
 
 install:
 	$(NPM) install
@@ -10,7 +11,7 @@ install:
 compile:
 	$(NPM) run tsc
 
-run: compile
+run: compile $(SETTINGS)
 	$(NODE) src/index.js --unhandled-rejections=strict
 
 mysql/docker:
@@ -26,4 +27,7 @@ migrate:
 	cat migration.sql|$(MYSQL) niconico
 
 $(MYSQL_CONFIG): my.sample.cnf
+	cp -f $< $@
+
+$(SETTINGS): settings.sample.json
 	cp -f $< $@
