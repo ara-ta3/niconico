@@ -4,6 +4,10 @@ import * as moment from "moment";
 import { JSDOM } from "jsdom";
 import { VideoID, ThreadResponseBody, ThreadID, Chat } from "./Contract";
 
+async function sleep(msec: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, msec));
+}
+
 export async function fetchVideoIds(seriesUrl: string): Promise<VideoID[]> {
   const dom = await JSDOM.fromURL(seriesUrl);
   const document = dom.window.document;
@@ -14,19 +18,31 @@ export async function fetchVideoIds(seriesUrl: string): Promise<VideoID[]> {
   );
 }
 
-export async function fetchThreadId(videoId: VideoID): Promise<ThreadID> {
+export async function fetchThreadId(
+  videoId: VideoID,
+  count: number = 1
+): Promise<ThreadID> {
   const url = `https://www.nicovideo.jp/watch/${videoId}`;
-  const page = await JSDOM.fromURL(url);
+  const res = await request.get(url);
+  const page = await new JSDOM(res);
   const apiDataDom = page.window.document.getElementById(
     "js-initial-watch-data"
   );
   if (apiDataDom === undefined || apiDataDom === null) {
-    return Promise.reject(
-      new JSInitialWatchDataNotFoundError(
-        `js-initial-watch-data dom is not found. video url = ${url}`,
-        videoId
-      )
+    if (count > 3) {
+      return Promise.reject(
+        new JSInitialWatchDataNotFoundError(
+          `js-initial-watch-data dom is not found. video url = ${url}`,
+          videoId
+        )
+      );
+    }
+    const msec = 1000 * (count * count);
+    console.info(
+      `failed to find js-initial-watch-data dom. video = ${videoId} count = ${count} wait ${msec} milliseconds`
     );
+    await sleep(msec);
+    return this.fetchThreadId(videoId, count + 1);
   }
   const jsonString = apiDataDom.attributes.getNamedItem("data-api-data").value;
   const json: {
