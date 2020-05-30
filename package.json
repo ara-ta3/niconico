@@ -1,0 +1,26 @@
+{
+  "name": "niconico",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ara-ta3/niconico.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ara-ta3/niconico/issues"
+  },
+  "homepage": "https://github.com/ara-ta3/niconico#readme",
+  "dependencies": {
+    "@types/jsdom": "^16.2.3",
+    "@types/request-promise-native": "^1.0.17",
+    "jsdom": "^16.2.2",
+    "request": "^2.88.2",
+    "request-promise-native": "^1.0.8"
+  }
+}
