@@ -76,15 +76,9 @@ export class CommentRepository {
     this.connection = connection;
   }
 
-  async deleteAll(): Promise<void> {
-    const query = "DELETE FROM comments;";
-    this.connection.query(query);
-    return;
-  }
-
   async put(comments: Map<VideoID, Chat[]>): Promise<void> {
     const query =
-      "INSERT INTO comments(no, video_id, user_id, content, posted_at) VALUES(?, ?, ?, ?, ?)";
+      "INSERT INTO comments(no, video_id, user_id, content, posted_at) VALUES(?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE content=VALUES(content)";
     comments.forEach((chats, videoId) => {
       chats.forEach((chat) => {
         const date = moment.unix(chat.date);

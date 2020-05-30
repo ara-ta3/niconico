@@ -23,7 +23,6 @@ async function main(args: string[]) {
 
   const repository = new CommentRepository(connection);
   connection.beginTransaction();
-  await repository.deleteAll();
   await repository.put(comments);
   connection.commit();
   connection.end();
