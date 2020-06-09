@@ -2,6 +2,9 @@
     "extends": [
         "config:base"
     ],
+    "schedule": [
+        "before 3pm"
+    ],
     "packageRules": [
         {
             "groupName": "All",
