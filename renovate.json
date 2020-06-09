@@ -9,7 +9,9 @@
     "packageRules": [
         {
             "groupName": "All",
-            "packagePatterns": [".*"]
+            "packagePatterns": [".*"],
+            "automerge": true,
+            "updateTypes": ["major","minor","patch","pin","digest","lockFileMaintenance","rollback","bump"]
         }
     ]
 }
