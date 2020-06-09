@@ -2,13 +2,11 @@
     "extends": [
         "config:base"
     ],
-    "schedule": [
-        "before 3pm"
-    ],
+    "timezone": "Asia/Tokyo",
     "packageRules": [
         {
             "groupName": "All",
-            "packagePatterns": ["*"]
+            "packagePatterns": [".*"]
         }
     ]
 }
