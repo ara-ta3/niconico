@@ -6,12 +6,11 @@
     "enabledManagers": [
         "npm"
     ],
+    "separateMajorMinor": false,
     "packageRules": [
         {
-            "groupName": "All",
-            "packagePatterns": [".*"],
-            "automerge": true,
-            "updateTypes": ["major","minor","patch","pin","digest","lockFileMaintenance","rollback","bump"]
+            "packagePatterns": ["*"],
+            "automerge": true
         }
     ]
 }
