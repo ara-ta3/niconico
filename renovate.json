@@ -3,6 +3,9 @@
         "config:base"
     ],
     "timezone": "Asia/Tokyo",
+    "enabledManagers": [
+        "npm"
+    ],
     "packageRules": [
         {
             "groupName": "All",
