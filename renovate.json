@@ -10,7 +10,8 @@
     "packageRules": [
         {
             "packagePatterns": ["*"],
-            "automerge": true
+            "automerge": true,
+            "groupName": "all packages"
         }
     ]
 }
