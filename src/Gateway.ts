@@ -3,8 +3,10 @@ import * as mysql from "promise-mysql";
 import * as moment from "moment";
 import { JSDOM } from "jsdom";
 import { VideoID, ThreadResponseBody, ThreadID, Chat, Video } from "./Contract";
+import fetch from "node-fetch";
 
-async function sleep(msec: number): Promise<void> {
+// TODO lib
+export async function sleep(msec: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, msec));
 }
 
@@ -17,19 +19,86 @@ export async function fetchVideoIds(seriesUrl: string): Promise<VideoID[]> {
     div.children[0].attributes["href"].value.replace("/watch/", "")
   );
 }
+async function fetchVideoFromEmbed(
+  videoId: VideoID
+): Promise<Omit<Video, "postedAt">> {
+  const url = `https://embed.nicovideo.jp/watch/${videoId}`;
+  const res = await fetch(url, {
+    headers: {
+      accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "accept-language": "ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7",
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+    },
+    method: "GET",
+  });
+  const body = await res.text();
+  const page = await new JSDOM(body);
+  const propsDom = page.window.document.getElementById("ext-player");
+  if (propsDom === undefined || propsDom === null) {
+    return Promise.reject(
+      new JSInitialWatchDataNotFoundError(
+        `ext-player dom is not found. video url = ${url}`,
+        videoId
+      )
+    );
+  }
+  const jsonString = propsDom.attributes.getNamedItem("data-props").value;
+  const json: {
+    videoId: string;
+    title: string;
+    thread: EmbededThread;
+  } = JSON.parse(jsonString);
+  return {
+    id: json.videoId,
+    title: json.title,
+    threadId: json.thread.id,
+  };
+}
 
-export async function fetchVideo(
-  videoId: VideoID,
-  count: number = 1
-): Promise<Video> {
+export async function fetchVideo(videoId: VideoID): Promise<Video> {
   const url = `https://www.nicovideo.jp/watch/${videoId}`;
-  const res = await request.get(url);
-  const page = await new JSDOM(res);
+  const res = await fetch(url, {
+    headers: {
+      accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+      "accept-language": "ja-JP,ja;q=0.9,en-US;q=0.8,en;q=0.7",
+      "cache-control": "max-age=0",
+      "sec-fetch-dest": "document",
+      "sec-fetch-mode": "navigate",
+      "sec-fetch-site": "none",
+      "sec-fetch-user": "?1",
+      "upgrade-insecure-requests": "1",
+      "user-agent":
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36",
+    },
+    method: "GET",
+  });
+  const body = await res.text();
+  const page = await new JSDOM(body);
   const apiDataDom = page.window.document.getElementById(
     "js-initial-watch-data"
   );
   if (apiDataDom === undefined || apiDataDom === null) {
-    if (count > 3) {
+    let uploadDate = null;
+    Array.from(page.window.document.getElementsByTagName("script")).forEach(
+      (script) => {
+        if (
+          script.type !== "application/ld+json" ||
+          script.innerText === undefined
+        ) {
+          return;
+        }
+        const json: { uploadDate: string } = JSON.parse(script.innerText);
+        if (json.uploadDate === undefined) {
+          return;
+        }
+
+        uploadDate = moment(json.uploadDate, "YYYY-MM-DDTHH:mm:ssZ");
+      }
+    );
+    if (uploadDate === null) {
       return Promise.reject(
         new JSInitialWatchDataNotFoundError(
           `js-initial-watch-data dom is not found. video url = ${url}`,
@@ -37,12 +106,12 @@ export async function fetchVideo(
         )
       );
     }
-    const msec = 1000 * (count * count);
-    console.info(
-      `failed to find js-initial-watch-data dom. video = ${videoId} count = ${count} wait ${msec} milliseconds`
-    );
-    await sleep(msec);
-    return this.fetchVideo(videoId, count + 1);
+
+    const partial = await fetchVideoFromEmbed(videoId);
+    return {
+      ...partial,
+      postedAt: uploadDate,
+    };
   }
   const jsonString = apiDataDom.attributes.getNamedItem("data-api-data").value;
   const json: {
@@ -79,6 +148,10 @@ export async function fetchChats(threadId: ThreadID): Promise<Chat[]> {
     }
   });
   return chats;
+}
+
+interface EmbededThread {
+  id: ThreadID;
 }
 
 interface Thread {

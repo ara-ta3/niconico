@@ -1,5 +1,5 @@
 import { SeriesID, VideoID, Chat, Video } from "./Contract";
-import { fetchVideoIds, fetchVideo, fetchChats } from "./Gateway";
+import { fetchVideoIds, fetchVideo, fetchChats, sleep } from "./Gateway";
 
 export async function fetch(
   seriesId: SeriesID
@@ -9,6 +9,7 @@ export async function fetch(
   let videos: Array<Video> = [];
   let comments: Map<string, Chat[]> = new Map();
   const all = ids.map(async (id) => {
+    await sleep(1000);
     const video: Video | null = await fetchVideo(id).catch((err) => {
       // FIXME instanceof
       if (err.videoId !== undefined) {
