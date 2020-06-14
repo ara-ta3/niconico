@@ -86,11 +86,11 @@ export async function fetchVideo(videoId: VideoID): Promise<Video> {
       (script) => {
         if (
           script.type !== "application/ld+json" ||
-          script.innerText === undefined
+          script.innerHTML === undefined
         ) {
           return;
         }
-        const json: { uploadDate: string } = JSON.parse(script.innerText);
+        const json: { uploadDate: string } = JSON.parse(script.innerHTML);
         if (json.uploadDate === undefined) {
           return;
         }
