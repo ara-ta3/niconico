@@ -2,22 +2,12 @@
     "extends": [
         "config:base"
     ],
-    "schedule": [
-        "every weekday",
-        "every weekend"
-    ],
     "timezone": "Asia/Tokyo",
-    "enabledManagers": [
-        "npm"
-    ],
     "separateMajorMinor": false,
     "packageRules": [
         {
             "packagePatterns": ["*"],
             "groupName": "all-packages"
         }
-    ],
-    "lockFileMaintenance": {
-        "enabled": false
-    }
+    ]
 }
