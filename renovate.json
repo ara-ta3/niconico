@@ -3,7 +3,8 @@
         "config:base"
     ],
     "schedule": [
-        "at any time"
+        "every weekday",
+        "every weekend"
     ],
     "timezone": "Asia/Tokyo",
     "enabledManagers": [
