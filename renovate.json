@@ -2,6 +2,9 @@
     "extends": [
         "config:base"
     ],
+    "schedule": [
+        "at any time"
+    ],
     "timezone": "Asia/Tokyo",
     "enabledManagers": [
         "npm"
