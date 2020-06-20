@@ -10,8 +10,10 @@
     "packageRules": [
         {
             "packagePatterns": ["*"],
-            "automerge": true,
-            "groupName": "all packages"
+            "groupName": "all-packages"
         }
-    ]
+    ],
+    "lockFileMaintenance": {
+        "enabled": false
+    }
 }
