@@ -14,6 +14,6 @@
         }
     ],
     "lockFileMaintenance": {
-        "enabled": false
+        "enabled": true
     }
 }
