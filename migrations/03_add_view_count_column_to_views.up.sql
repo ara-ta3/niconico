@@ -1,0 +1,1 @@
+alter table videos add column view_count int unsigned not null default 0;

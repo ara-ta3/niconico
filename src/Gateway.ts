@@ -48,11 +48,13 @@ async function fetchVideoFromEmbed(
   const json: {
     videoId: string;
     title: string;
+    viewCounter: number;
     thread: EmbededThread;
   } = JSON.parse(jsonString);
   return {
     id: json.videoId,
     title: json.title,
+    viewCount: json.viewCounter,
     threadId: json.thread.id,
   };
 }
@@ -77,9 +79,13 @@ export async function fetchVideo(videoId: VideoID): Promise<Video> {
   });
   const body = await res.text();
   const page = await new JSDOM(body);
+
+
+
   const apiDataDom = page.window.document.getElementById(
     "js-initial-watch-data"
   );
+
   if (apiDataDom === undefined || apiDataDom === null) {
     let uploadDate = null;
     Array.from(page.window.document.getElementsByTagName("script")).forEach(
@@ -98,6 +104,7 @@ export async function fetchVideo(videoId: VideoID): Promise<Video> {
         uploadDate = moment(json.uploadDate, "YYYY-MM-DDTHH:mm:ssZ");
       }
     );
+
     if (uploadDate === null) {
       return Promise.reject(
         new JSInitialWatchDataNotFoundError(
@@ -117,6 +124,7 @@ export async function fetchVideo(videoId: VideoID): Promise<Video> {
   const json: {
     video: {
       title: string;
+      viewCount: number;
       postedDateTime: string;
     };
     thread: Thread;
@@ -126,6 +134,7 @@ export async function fetchVideo(videoId: VideoID): Promise<Video> {
     id: videoId,
     title: json.video.title,
     threadId: thread.ids.default,
+    viewCount: json.video.viewCount,
     postedAt: moment(json.video.postedDateTime, "YYYY/MM/DD HH:mm:ss"),
   };
 }
@@ -200,11 +209,12 @@ export class VideoRepository {
 
   async put(videos: Video[]): Promise<void> {
     const query =
-      "INSERT INTO videos(id, title, posted_at) VALUES(?, ?, ?) ON DUPLICATE KEY UPDATE title=VALUES(title)";
+      "INSERT INTO videos(id, title, view_count, posted_at) VALUES(?, ?, ?, ?) ON DUPLICATE KEY UPDATE view_count=VALUES(view_count)";
     videos.forEach((video) => {
       this.connection.query(query, [
         video.id,
         video.title,
+        video.viewCount,
         video.postedAt.format("YYYY-MM-DDTHH:mm:ss"),
       ]);
     });

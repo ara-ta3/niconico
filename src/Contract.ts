@@ -20,5 +20,6 @@ export interface Video {
   id: VideoID;
   title: string;
   threadId: ThreadID;
+  viewCount: number;
   postedAt: moment.Moment;
 }
