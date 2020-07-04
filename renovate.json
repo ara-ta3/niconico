@@ -9,5 +9,8 @@
             "packagePatterns": ["*"],
             "groupName": "all-packages"
         }
-    ]
+    ],
+    "lockFileMaintenance": {
+        "enabled": false
+    }
 }
