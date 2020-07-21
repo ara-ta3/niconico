@@ -105,5 +105,5 @@ dist
 
 src/*js
 src/*js.map
-.my.cnf
+.my.cnf*
 settings.json
