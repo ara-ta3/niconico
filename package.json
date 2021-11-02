@@ -24,7 +24,7 @@
     "@types/node": "^15.0.0",
     "@types/node-fetch": "^2.5.7",
     "@types/request-promise-native": "^1.0.17",
-    "jsdom": "^16.2.2",
+    "jsdom": "^18.0.1",
     "moment": "^2.26.0",
     "node-fetch": "^2.6.0",
     "promise-mysql": "^5.0.1",
