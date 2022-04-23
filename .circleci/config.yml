@@ -23,5 +23,3 @@ jobs:
           key: ui-cache-{{ checksum "package.json" }}
 
       - run: make compile
-
-      - run: make test
