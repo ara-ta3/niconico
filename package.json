@@ -18,18 +18,18 @@
   "homepage": "https://github.com/ara-ta3/niconico#readme",
   "dependencies": {
     "@types/fs-promise": "^2.0.0",
-    "@types/jsdom": "^16.2.2",
+    "@types/jsdom": "^21.0.0",
     "@types/moment": "^2.13.0",
     "@types/mysql": "^2.15.13",
-    "@types/node": "^16.0.0",
+    "@types/node": "^20.0.0",
     "@types/node-fetch": "^2.5.7",
     "@types/request-promise-native": "^1.0.17",
-    "jsdom": "^19.0.0",
+    "jsdom": "^23.0.0",
     "moment": "^2.26.0",
     "node-fetch": "^3.0.0",
     "promise-mysql": "^5.0.1",
     "request": "^2.88.2",
     "request-promise-native": "^1.0.8",
-    "typescript": "^4.0.2"
+    "typescript": "^5.0.0"
   }
 }
